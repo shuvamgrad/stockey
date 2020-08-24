@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block app_content %}
+<h1>Enter Stock Name for Price</h1>
+<form action="" method="POST">
+	{{ form.hidden_tag() }}
+	<p>
+		{{ form.stock_name.label }}<br>
+		{{ form.stock_name(size=32) }}
+	</p>
+	<p>
+		{{ form.submit() }}
+	</p>
+</form>
+{% endblock %}
