@@ -15,9 +15,30 @@
 		<tr>
 			<th scope="row">{{ stock.id }}</th>
 			<td>{{ stock.name }}</td>
-			<td>{{ stock.price }}</td>
+			<td id="{{ stock.id }}_price">{{ stock.price }}</td>
 		</tr>
 		{% endfor %}
 	</tbody>
 </table>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+<script>
+	$(function() {
+		$.ajax({
+			type: 'GET',
+			url: '/stock'
+			success: $.getJson(function(data) {
+				if (data['id'] && data['price']) {
+					$(data['id']+'_price').text(data['price']);
+				}
+			},
+			error: function() {
+				alert('Unexpected error');
+			});
+		});
+	});
+</script>
+
+
 {% endblock %}
