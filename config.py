@@ -9,4 +9,5 @@ class Config(object):
 	FUNDAMENTAL_ANALYSIS_API_KEY = 'ce9149a43b8714721a331e703e962ecf'
 	CELERY_BROKER_URL = 'redis://localhost:6379/0'
 	CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+	FLASK_DEBUG = 1
 	
