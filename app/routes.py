@@ -11,42 +11,38 @@ def getStockName():
 	form = StockNameForm()
 	if form.validate_on_submit():
 		for name in form.stock_name.data.split(','):
-			stock = Stock(name=name)
-			db.session.add(stock)
-			db.session.commit()
-		return redirect(url_for('stock'))
+			name = name.strip()
+			if not Stock.query.filter_by(name=name).first():
+				stock = Stock(name=name)
+				db.session.add(stock)
+				# stocks.append(name)
+		db.session.commit()
+		stocks = Stock.query.all()
+		task = get_background_price.apply_async()
+		location_url = url_for('taskstatus', task_id=task.id)
+		form.stock_name.data = ""
+		return render_template('index.html', title='Stockey', stocks=stocks, form=form, location_url=location_url)
 	return render_template('index.html', title='Stockey', form=form)
 
 
-@app.route('/stock')
-def stock():
-	stocks = Stock.query.all()
-	task = get_background_price.apply_async()
-	return render_template('stock.html', title='Stock Details', stocks=stocks)
-
-
-@celery.task()
-def get_background_price():
+@celery.task(bind=True)
+def get_background_price(self):
+	stock_dict = []
 	stocks = Stock.query.all()
 	for stock in stocks:
 		profile = fa.profile(str(stock.name), str(app.config['FUNDAMENTAL_ANALYSIS_API_KEY']))
+		# price = profile.to_dict()[0]['price']
 		stock.price = profile.to_dict()[0]['price']
-		db.session.add(stock)
-		# self.update_state(state='PROGRESS',
-		# 					meta={'id': stock.id, 'name': stock.name, 'price': stock.price})
+		stock_list = {'id':stock.id,'name':stock.name, 'price':stock.price}
+		stock_dict.append(stock_list)
+		self.update_state(state='PROGRESS', meta={'stock_dict':stock_dict})
 	db.session.commit()
-	return {'state':'COMPLETE'}
+	return {'status':'COMPLETE', 'stock_dict': stock_dict}
+
+@app.route('/status/<task_id>')
+def taskstatus(task_id):
+	task = get_background_price.AsyncResult(task_id)
+	if task.state != 'FAILURE':
+		return json.dumps(task.info.get('stock_dict'))
 
 
-@app.route('/status')
-def status():
-	stock_list = []
-	stocks = Stock.query.all()
-	for stock in stocks:
-		if stock.price != None:
-			response = {
-				'id': stock.id,
-				'price': stock.price
-			}
-			stock_list.append(response)
-	return json.dumps(stock_list)

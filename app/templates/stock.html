@@ -25,22 +25,27 @@
 
 <script>
 	$(function() {
-		function loadPrice() {
-			$.get('/status', function(data) {
-				var stock_data = $.parseJSON(data)
-				console.log(stock_data)
-				for (var i = 0; i < stock_data.length; i++) {
-					$('#price' + stock_data[i]['id']).text(stock_data[i]['price']);
-					if (stock_data[i]['price'] == null) {
-						setInterval(loadPrice, 5000);
-					}
-				}
-				
-			});
+		if ('{{ task_id }}') {
+			var task_id = '{{ task_id }}'
 		}
-		//loadPrice();
-		setInterval(loadPrice, 10000);
 	});
+	// $(function() {
+	// 	function loadPrice() {
+	// 		$.get('/status', function(data) {
+	// 			var stock_data = $.parseJSON(data)
+	// 			console.log(stock_data)
+	// 			for (var i = 0; i < stock_data.length; i++) {
+	// 				$('#price' + stock_data[i]['id']).text(stock_data[i]['price']);
+	// 				if (stock_data[i]['price'] == null) {
+	// 					setInterval(loadPrice, 5000);
+	// 				}
+	// 			}
+				
+	// 		});
+	// 	}
+	// 	//loadPrice();
+	// 	//setInterval(loadPrice, 10000);
+	// });
 </script>
 
 

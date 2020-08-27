@@ -12,4 +12,56 @@
 		{{ form.submit() }}
 	</p>
 </form>
+
+<hr>
+
+{% if stocks %}
+<h1>Stock Details</h1>
+<table class="table">
+	<thead>
+		<tr>
+			<th scope="col">SN</th>
+			<th scope="col">Stock Name</th>
+			<th scope="col">Stock Price</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for stock in stocks %}
+		<tr>
+			<th scope="row">{{ stock.id }}</th>
+			<td>{{ stock.name }}</td>
+			<td id="price{{ stock.id }}" class="price">{{ stock.price }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% endif %}
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+<script>
+	$(function() {
+		function loadPrice() {
+			if ('{{ location_url }}') {
+				var location_url = '{{ location_url }}';
+				$.get(location_url, function(data) {
+					var stock_data = $.parseJSON(data)
+					for (var i = 0; i < stock_data.length; i++) {
+						$('#price' + stock_data[i]['id']).text(stock_data[i]['price']);
+						$(".price").each(function() {
+							if ($(this).text() == 'None') {
+								loadPrice();
+							}
+						});
+					}
+				});
+			}
+		}
+
+		setTimeout(loadPrice, 2000);
+	});
+</script>
+
+
 {% endblock %}
