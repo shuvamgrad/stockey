@@ -51,7 +51,7 @@
 						$('#price' + stock_data[i]['id']).text(stock_data[i]['price']);
 						$(".price").each(function() {
 							if ($(this).text() == 'None') {
-								loadPrice();
+								setTimeout(loadPrice, 500);
 							}
 						});
 					}

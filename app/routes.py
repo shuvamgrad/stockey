@@ -30,12 +30,12 @@ def get_background_price(self):
 	stock_dict = []
 	stocks = Stock.query.all()
 	for stock in stocks:
-		profile = fa.profile(str(stock.name), str(app.config['FUNDAMENTAL_ANALYSIS_API_KEY']))
-		# price = profile.to_dict()[0]['price']
-		stock.price = profile.to_dict()[0]['price']
-		stock_list = {'id':stock.id,'name':stock.name, 'price':stock.price}
-		stock_dict.append(stock_list)
-		self.update_state(state='PROGRESS', meta={'stock_dict':stock_dict})
+		if stock.price == None:
+			profile = fa.profile(str(stock.name), str(app.config['FUNDAMENTAL_ANALYSIS_API_KEY']))
+			stock.price = profile.to_dict()[0]['price']
+			stock_list = {'id':stock.id,'name':stock.name, 'price':stock.price}
+			stock_dict.append(stock_list)
+			self.update_state(state='PROGRESS', meta={'stock_dict':stock_dict})
 	db.session.commit()
 	return {'status':'COMPLETE', 'stock_dict': stock_dict}
 
